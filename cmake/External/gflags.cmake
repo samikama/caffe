@@ -4,9 +4,13 @@ if (NOT __GFLAGS_INCLUDED) # guard against multiple includes
   # use the system-wide gflags if present
   # allow user to specify custom installed location
   # and finding gflags-config.cmake default installed version
-  find_package(gflags NAMES gflags GFlags HINTS ${gflags_DIR})
+  find_package(gflags  QUIET HINTS ${gflags_DIR})
   if (gflags_FOUND)
     set(GFLAGS_FOUND TRUE)
+  # else()
+  #   # use built-in FindGFlags.cmake
+  #   find_package(GFlags)
+  #   set(gflags_DIR ${GFLAGS_ROOT_DIR})
   endif()
   if (GFLAGS_FOUND)
     set(GFLAGS_EXTERNAL FALSE)
@@ -29,10 +33,11 @@ if (NOT __GFLAGS_INCLUDED) # guard against multiple includes
     set(GFLAGS_C_FLAGS ${CMAKE_C_FLAGS} ${GFLAGS_EXTRA_COMPILER_FLAGS})
 
     ExternalProject_Add(gflags
-      PREFIX ${gflags_PREFIX}
       GIT_REPOSITORY "https://github.com/gflags/gflags.git"
       GIT_TAG "v2.1.2"
       UPDATE_COMMAND ""
+      SOURCE_DIR ${gflags_PREFIX}
+      BUILD_DIR "${CMAKE_BINARY_DIR}/external/gflags-build"
       INSTALL_DIR ${gflags_INSTALL}
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                  -DCMAKE_INSTALL_PREFIX=${gflags_INSTALL}
@@ -48,12 +53,13 @@ if (NOT __GFLAGS_INCLUDED) # guard against multiple includes
       LOG_DOWNLOAD 1
       LOG_INSTALL 1
       )
-
+    
     set(GFLAGS_FOUND TRUE)
     set(GFLAGS_INCLUDE_DIRS ${gflags_INSTALL}/include)
     set(GFLAGS_LIBRARIES ${gflags_INSTALL}/lib/libgflags.a ${CMAKE_THREAD_LIBS_INIT})
     set(GFLAGS_LIBRARY_DIRS ${gflags_INSTALL}/lib)
     set(GFLAGS_EXTERNAL TRUE)
+    set(gflags_DIR ${gflags_INSTALL})
 
     list(APPEND external_project_dependencies gflags)
   endif()
