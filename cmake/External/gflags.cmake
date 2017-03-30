@@ -2,7 +2,12 @@ if (NOT __GFLAGS_INCLUDED) # guard against multiple includes
   set(__GFLAGS_INCLUDED TRUE)
 
   # use the system-wide gflags if present
-  find_package(GFlags)
+  # allow user to specify custom installed location
+  # and finding gflags-config.cmake default installed version
+  find_package(gflags NAMES gflags GFlags HINTS ${gflags_DIR})
+  if (gflags_FOUND)
+    set(GFLAGS_FOUND TRUE)
+  endif()
   if (GFLAGS_FOUND)
     set(GFLAGS_EXTERNAL FALSE)
   else()

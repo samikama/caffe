@@ -4,8 +4,13 @@ include("cmake/External/gflags.cmake")
 if (NOT __GLOG_INCLUDED)
   set(__GLOG_INCLUDED TRUE)
 
-  # try the system-wide glog first
-  find_package(Glog)
+  # try the system-wide glog first,
+  # allow user to define a custom installed location
+  # and check for glog-config.cmake
+  find_package(glog NAMES Glog glog HINTS ${glog_DIR})
+  if(glog_FOUND)
+    set(GLOG_FOUND TRUE)
+  endif()
   if (GLOG_FOUND)
       set(GLOG_EXTERNAL FALSE)
   else()
